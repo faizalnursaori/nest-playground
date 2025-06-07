@@ -4,6 +4,7 @@ import { compare, hash } from 'bcrypt';
 import { LoginDTO } from './dto/signin.dto';
 import { RegisterDTO } from './dto/signup.dto';
 import jwt from 'jsonwebtoken';
+import { userInfo } from 'os';
 
 @Injectable()
 export class UsersService {
@@ -40,5 +41,28 @@ export class UsersService {
     );
 
     return { token, user: { id: user.id, email: user.email } };
+  }
+
+  async getAllUser() {
+    const getUsers = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+    return { getUsers };
+  }
+
+  async getUserById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+    return user;
   }
 }

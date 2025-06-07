@@ -1,10 +1,16 @@
+### Find All User
+GET http://localhost:3000/users
+
+### Find User By Id
+GET http://localhost:3000/users/67d78910-8d43-4944-991e-1641dd0f9672
+
 ### Register
 POST http://localhost:3000/users/register
 Content-Type: application/json
 
 {
-    "email": "faizalrahmatn@gmail.com",
-    "password": "faizalrahm"
+    "email": "faizalrahmatnur@gmail.com",
+    "password": "faizalrn"
 }
 
 ### Login
@@ -12,6 +18,6 @@ POST http://localhost:3000/users/login
 Content-Type: application/json
 
 {
-    "email": "faizalrahmatn@gmail.com",
-    "password": "faizalrahm"
+    "email": "faizalrahmatnur@gmail.com",
+    "password": "faizalrn"
 }
