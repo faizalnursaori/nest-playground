@@ -4,6 +4,14 @@ GET http://localhost:3000/users
 ### Find User By Id
 GET http://localhost:3000/users/67d78910-8d43-4944-991e-1641dd0f9672
 
+### Edit User
+PATCH http://localhost:3000/users/2619c668-60d4-4a70-80d7-73cd0c1085f5
+Content-Type: application/json
+
+{
+    "password": "newpassword"
+}
+
 ### Register
 POST http://localhost:3000/users/register
 Content-Type: application/json
@@ -19,5 +27,5 @@ Content-Type: application/json
 
 {
     "email": "faizalrahmatnur@gmail.com",
-    "password": "faizalrn"
+    "password": "newpassword"
 }
