@@ -1,8 +1,8 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -39,10 +39,11 @@ export class UsersController {
   @Patch(':id')
   async updateUser(@Param('id') id: string, @Body() userData: UpdateUserDTO) {
     // console.log('Received userData:', userData);
-    const updatedUser = await this.userService.updateUser(id, userData);
-    if (!updatedUser) {
-      throw new NotFoundException('User not found');
-    }
-    return updatedUser;
+    return this.userService.updateUser(id, userData);
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    return this.userService.deleteUser(id);
   }
 }

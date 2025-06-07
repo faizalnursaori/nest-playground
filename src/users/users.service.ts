@@ -125,33 +125,79 @@ export class UsersService {
   }
 
   async updateUser(id: string, userData: UpdateUserDTO) {
-    // console.log('Service received:', userData);
-    if (userData.email) {
-      const existingUser = await this.prisma.user.findUnique({
-        where: {
-          email: userData.email,
+    try {
+      if (userData.email) {
+        const existingUser = await this.prisma.user.findUnique({
+          where: {
+            email: userData.email,
+          },
+        });
+        if (existingUser && existingUser.id !== id) {
+          throw new ConflictException('Email already exist');
+        }
+        return {
+          message: 'No changes detected. User data remains the same.',
+          data: existingUser,
+        };
+      }
+
+      const user = await this.prisma.user.findUnique({ where: { id } });
+      if (!user) throw new NotFoundException('User not Found');
+
+      if (userData.password) {
+        userData.password = await hash(userData.password, 10);
+      }
+
+      const updateUser = await this.prisma.user.update({
+        where: { id },
+        data: userData,
+        select: {
+          id: true,
+          email: true,
         },
       });
-      if (existingUser && existingUser.id !== id) {
-        throw new ConflictException('Email already exist');
+      return updateUser;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
       }
+      console.error(`Error updating user with id ${id}`, error);
+      throw new InternalServerErrorException(
+        'Something went wrong while updating user',
+      );
     }
+  }
 
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) return null;
+  async deleteUser(id: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+      });
+      if (!user) throw new NotFoundException('User not Found');
 
-    if (userData.password) {
-      userData.password = await hash(userData.password, 10);
+      const deleteUser = await this.prisma.user.delete({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+          email: true,
+        },
+      });
+      return {
+        message: 'User deleted successfully',
+        data: deleteUser,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error(`Error deleting user with id ${id}`, error);
+      throw new InternalServerErrorException(
+        'Something went wrong while deleting user',
+      );
     }
-
-    const updateUser = await this.prisma.user.update({
-      where: { id },
-      data: userData,
-      select: {
-        id: true,
-        email: true,
-      },
-    });
-    return updateUser;
   }
 }

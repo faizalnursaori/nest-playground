@@ -5,20 +5,24 @@ GET http://localhost:3000/users
 GET http://localhost:3000/users/67d78910-8d43-4944-991e-1641dd0f9672
 
 ### Edit User
-PATCH http://localhost:3000/users/2619c668-60d4-4a70-80d7-73cd0c1085f5
+PATCH http://localhost:3000/users/2674b92d-224f-4d77-9b10-76827a3f7d23
 Content-Type: application/json
 
 {
-    "password": "newpassword"
+  "password": "newpassword"
 }
+
+
+### Delete User By Id
+DELETE http://localhost:3000/users/791b4ea9-66bd-4390-b1fc-dd2bc935717e
 
 ### Register
 POST http://localhost:3000/users/register
 Content-Type: application/json
 
 {
-    "email": "faizalrahmatnur@gmail.com",
-    "password": "faizalrn"
+    "email": "fabiankan@gmail.com",
+    "password": "kabizal"
 }
 
 ### Login
@@ -26,6 +30,8 @@ POST http://localhost:3000/users/login
 Content-Type: application/json
 
 {
-    "email": "faizalrahmatnur@gmail.com",
+    "email": "fabianka@gmail.com",
     "password": "newpassword"
 }
+
+
