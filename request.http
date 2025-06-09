@@ -5,7 +5,7 @@ GET http://localhost:3000/users
 GET http://localhost:3000/users/67d78910-8d43-4944-991e-1641dd0f9672
 
 ### Edit User
-PATCH http://localhost:3000/users/2674b92d-224f-4d77-9b10-76827a3f7d23
+PATCH http://localhost:3000/users/e4d5ee91-ea98-4d4a-8681-3474c33f8521
 Content-Type: application/json
 
 {
@@ -21,7 +21,7 @@ POST http://localhost:3000/users/register
 Content-Type: application/json
 
 {
-    "email": "fabiankan@gmail.com",
+    "email": "fabiankanur@gmail.com",
     "password": "kabizal"
 }
 
@@ -30,7 +30,7 @@ POST http://localhost:3000/users/login
 Content-Type: application/json
 
 {
-    "email": "fabianka@gmail.com",
+    "email": "fabiankanur@gmail.com",
     "password": "newpassword"
 }
 

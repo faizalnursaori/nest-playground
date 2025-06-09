@@ -5,39 +5,34 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { compare, hash } from 'bcrypt';
 import { LoginDTO } from './dto/signin.dto';
 import { RegisterDTO } from './dto/signup.dto';
 import { UpdateUserDTO } from './dto/update.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserRepository } from './user.repository';
 @Injectable()
 export class UsersService {
   constructor(
-    private prisma: PrismaService,
     private jwtService: JwtService,
+    private userRepo: UserRepository,
   ) {}
 
   async register(data: RegisterDTO) {
     try {
-      const existingUser = await this.prisma.user.findUnique({
-        where: {
-          email: data.email,
-        },
-      });
+      const existingUser = await this.userRepo.findByEmail(data.email);
 
       if (existingUser) {
         throw new ConflictException('User already exists');
       }
 
       const hashedPassword = await hash(data.password, 10);
-      const user = await this.prisma.user.create({
-        data: {
-          email: data.email,
-          password: hashedPassword,
-        },
+      const user = await this.userRepo.createUser({
+        ...data,
+        password: hashedPassword,
       });
-      return { id: user.id, email: user.email };
+
+      return { message: 'Register Succes', id: user.id, email: user.email };
     } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
@@ -51,11 +46,7 @@ export class UsersService {
 
   async login(data: LoginDTO) {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          email: data.email,
-        },
-      });
+      const user = await this.userRepo.findByEmail(data.email);
       if (!user) throw new UnauthorizedException('Invalid Credentials');
 
       const isMatch = await compare(data.password, user.password);
@@ -83,12 +74,7 @@ export class UsersService {
 
   async getAllUsers() {
     try {
-      const users = await this.prisma.user.findMany({
-        select: {
-          id: true,
-          email: true,
-        },
-      });
+      const users = await this.userRepo.getAllUser();
       return { users };
     } catch (error) {
       console.error('Error fetching users', error);
@@ -100,15 +86,7 @@ export class UsersService {
 
   async getUserById(id: string) {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id,
-        },
-        select: {
-          id: true,
-          email: true,
-        },
-      });
+      const user = await this.userRepo.findById(id);
       if (!user) {
         throw new NotFoundException('User not found');
       }
@@ -127,11 +105,7 @@ export class UsersService {
   async updateUser(id: string, userData: UpdateUserDTO) {
     try {
       if (userData.email) {
-        const existingUser = await this.prisma.user.findUnique({
-          where: {
-            email: userData.email,
-          },
-        });
+        const existingUser = await this.userRepo.findByEmail(userData.email);
         if (existingUser && existingUser.id !== id) {
           throw new ConflictException('Email already exist');
         }
@@ -141,21 +115,14 @@ export class UsersService {
         };
       }
 
-      const user = await this.prisma.user.findUnique({ where: { id } });
+      const user = await this.userRepo.findById(id);
       if (!user) throw new NotFoundException('User not Found');
 
       if (userData.password) {
         userData.password = await hash(userData.password, 10);
       }
 
-      const updateUser = await this.prisma.user.update({
-        where: { id },
-        data: userData,
-        select: {
-          id: true,
-          email: true,
-        },
-      });
+      const updateUser = await this.userRepo.updateUser(id, userData);
       return updateUser;
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -170,22 +137,10 @@ export class UsersService {
 
   async deleteUser(id: string) {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id,
-        },
-      });
+      const user = await this.userRepo.findById(id);
       if (!user) throw new NotFoundException('User not Found');
 
-      const deleteUser = await this.prisma.user.delete({
-        where: {
-          id,
-        },
-        select: {
-          id: true,
-          email: true,
-        },
-      });
+      const deleteUser = await this.userRepo.deleteUser(id);
       return {
         message: 'User deleted successfully',
         data: deleteUser,

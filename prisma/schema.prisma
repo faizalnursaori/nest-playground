@@ -8,11 +8,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model User {
   id       String   @id @default(uuid())
   email    String   @unique
+  role     Role     @default(USER)
   password String
-  Report   Report[]
+  reports  Report[]
 }
 
 model Report {
@@ -21,8 +27,8 @@ model Report {
   model     String
   year      Int
   mileage   Int
-  longitude Float
   latitude  Float
+  longitude Float
   price     Int?
   approved  Boolean  @default(false)
   user      User     @relation(fields: [userId], references: [id])
